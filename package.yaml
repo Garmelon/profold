@@ -1,0 +1,34 @@
+name:                profold
+version:             0.1.0.0
+license:             MIT
+author:              "Garmelon <joscha@plugh.de>"
+copyright:           "2020 Garmelon"
+
+synopsis:            A TUI viewer for GHC .prof files that can fold/unfold sections
+description:         Please see the README on GitHub at <https://github.com/Garmelon/profold#readme>
+github:              "Garmelon/profold"
+
+extra-source-files:
+- README.md
+- CHANGELOG.md
+
+dependencies:
+- base >= 4.7 && < 5
+- containers
+- megaparsec
+- text
+- vector
+
+library:
+  source-dirs: src
+
+executables:
+  profold:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - profold
