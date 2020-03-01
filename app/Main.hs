@@ -4,16 +4,19 @@ module Main where
 
 import           Brick
 import           Control.Monad
-import qualified Graphics.Vty     as Vty
+import qualified Data.Text.IO          as T
+import qualified Graphics.Vty          as Vty
+import           Options.Applicative
 
-import           Profold.LineNode
+import           Profold.Options
+import           Profold.ParseProfFile
 import           Profold.UiState
 
 data UiName = UiViewport
   deriving (Show, Eq, Ord)
 
 myAppDraw :: UiState -> [Widget UiName]
-myAppDraw s = [viewport UiViewport Vertical $ renderUiState s]
+myAppDraw s = [renderUiState UiViewport s]
 
 myHandleEvent :: UiState -> BrickEvent n e -> EventM n (Next UiState)
 myHandleEvent s (VtyEvent (Vty.EvKey Vty.KEsc _))         = halt s
@@ -32,7 +35,7 @@ myAttrMap = attrMap Vty.defAttr
 
 myApp :: App UiState () UiName
 myApp = App
-  { appDraw         = \s -> [renderUiState s]
+  { appDraw         = myAppDraw
   , appChooseCursor = neverShowCursor
   , appHandleEvent  = myHandleEvent
   , appStartEvent   = pure
@@ -40,7 +43,12 @@ myApp = App
   }
 
 main :: IO ()
-main = void $ defaultMain myApp $ newUiState $ newLineNode "Hello world"
-  [ newLineNode " Child" []
-  , newLineNode " More children" []
-  ]
+main = do
+  opts <- execParser options
+  let filename = optFileName opts
+  text <- T.readFile filename
+  case parseProfFile filename text of
+    Left e     -> putStrLn e
+    Right f -> do
+      print f
+      void $ defaultMain myApp $ newUiState (profInfoLines f) (profNode f)

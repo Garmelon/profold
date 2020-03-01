@@ -13,18 +13,20 @@ module Profold.UiState
 
 import           Brick
 import           Data.Maybe
+import qualified Data.Text        as T
 import qualified Data.Vector      as V
 
 import           Profold.LineNode
 import           Profold.Util
 
 data UiState = UiState
-  { uiTree    :: LineNode
+  { uiInfo    :: [T.Text]
+  , uiTree    :: LineNode
   , uiFocused :: Path
   } deriving (Show)
 
-newUiState :: LineNode -> UiState
-newUiState ln = UiState ln []
+newUiState :: [T.Text] -> LineNode -> UiState
+newUiState info ln = UiState info ln []
 
 moveFocusUp :: UiState -> UiState
 moveFocusUp s =
@@ -50,24 +52,22 @@ toggleFold s =
       | V.null $ lineChildren ln = ln
       | otherwise = ln {lineFolded = not $ lineFolded ln}
 
-wrapFolded :: Bool -> Widget n -> Widget n
-wrapFolded False widget = withDefAttr "unfolded" $ str " " <+> widget
-wrapFolded True widget  = withDefAttr "folded" $ str "+" <+> widget
-
 wrapFocused :: Bool -> Widget n -> Widget n
 wrapFocused False = withDefAttr "unfocused"
 wrapFocused True  = visible . withDefAttr "focused"
 
 renderLine :: Bool -> LineNode -> Widget n
 renderLine focused ln =
-  wrapFocused focused $
-  wrapFolded foldedWithChildren $ padRight Max $ txt $ lineText ln
-  where
-    foldedWithChildren = lineFolded ln && not (V.null $ lineChildren ln)
+  let prefix
+        | V.null $ lineChildren ln = " "
+        | lineFolded ln = "+"
+        | otherwise = "-"
+  in  wrapFocused focused $ padRight Max $ str prefix <+> txt (lineText ln)
 
-renderUiState :: UiState -> Widget n
-renderUiState s =
-  let flat = V.toList $ flatten $ uiTree s
+renderUiState :: (Show n, Ord n) => n -> UiState -> Widget n
+renderUiState n s =
+  let info = vBox $ map txt $ uiInfo s
+      flat = V.toList $ flatten $ uiTree s
       focused = uiFocused s
       rendered = map (\(p, ln) -> renderLine (p == focused) ln) flat
-  in  vBox rendered
+  in  info <=> viewport n Vertical (vBox rendered)
