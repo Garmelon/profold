@@ -9,8 +9,6 @@ module Profold.LineNode
 import qualified Data.Text    as T
 import qualified Data.Vector  as V
 
-import           Profold.Util
-
 data LineNode = LineNode
   { lineText     :: T.Text
   , lineChildren :: V.Vector LineNode
@@ -31,6 +29,10 @@ flatten ln
   where
     flattenChild :: Int -> LineNode -> V.Vector (Path, LineNode)
     flattenChild i c = V.map (\(is, n) -> (i : is, n)) $ flatten c
+
+modifyAtIndex :: Int -> (a -> a) -> V.Vector a -> V.Vector a
+-- Yes, this function looks ugly, but it's short enough that I don't care.
+modifyAtIndex i f v = maybe v (\a -> v V.// [(i, f a)]) (v V.!? i)
 
 modify :: (LineNode -> LineNode) -> Path -> LineNode -> LineNode
 modify f [] ln = f ln
