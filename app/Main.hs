@@ -49,6 +49,4 @@ main = do
   text <- T.readFile filename
   case parseProfFile filename text of
     Left e     -> putStrLn e
-    Right f -> do
-      print f
-      void $ defaultMain myApp $ newUiState (profInfoLines f) (profNode f)
+    Right f -> void $ defaultMain myApp $ newUiState (profInfoLines f) (profNode f)
