@@ -4,7 +4,7 @@ license:             MIT
 author:              "Garmelon <joscha@plugh.de>"
 copyright:           "2020 Garmelon"
 
-synopsis:            A TUI viewer for GHC .prof files that can fold/unfold sections
+synopsis:            A TUI viewer for GHC .prof files
 description:         Please see the README on GitHub at <https://github.com/Garmelon/profold#readme>
 github:              "Garmelon/profold"
 
