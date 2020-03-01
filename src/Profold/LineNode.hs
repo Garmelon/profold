@@ -27,7 +27,10 @@ flatten ln
   | lineFolded ln = V.singleton ([], ln)
   | otherwise =
     V.cons ([], ln) $
-    V.imap (\i (is, n) -> (i : is, n)) $ V.concatMap flatten $ lineChildren ln
+    V.concat $ V.toList $ V.imap flattenChild $ lineChildren ln
+  where
+    flattenChild :: Int -> LineNode -> V.Vector (Path, LineNode)
+    flattenChild i c = V.map (\(is, n) -> (i : is, n)) $ flatten c
 
 modify :: (LineNode -> LineNode) -> Path -> LineNode -> LineNode
 modify f [] ln = f ln
