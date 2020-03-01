@@ -24,7 +24,7 @@ data UiState = UiState
   } deriving (Show)
 
 newUiState :: [T.Text] -> LineNode -> UiState
-newUiState info ln = UiState info ln $ list UiList (flatten ln) 1
+newUiState info ln = toggleFold $ UiState info ln $ list UiList (flatten ln) 1
 
 toggleFold :: UiState -> UiState
 toggleFold s = case listSelectedElement (uiList s) of
@@ -51,8 +51,8 @@ renderLine focused (_, ln)
 
 renderUiState :: UiState -> Widget UiName
 renderUiState s =
-  let info = vBox $ map (\t -> str " " <+> txt t) $ uiInfo s
-  in  info <=> renderList renderLine True (uiList s)
+  let info = padRight Max $ vBox $ map (\t -> str " " <+> txt t) $ uiInfo s
+  in  withDefAttr "info" info <=> renderList renderLine True (uiList s)
 
 {- The actual App -}
 
@@ -71,6 +71,7 @@ myHandleEvent s _ = continue s
 myAttrMap :: AttrMap
 myAttrMap = attrMap Vty.defAttr
   [ ("focused", Vty.defAttr `Vty.withStyle` Vty.reverseVideo)
+  , ("info", Vty.defAttr `Vty.withStyle` Vty.reverseVideo)
   ]
 
 myApp :: App UiState () UiName
