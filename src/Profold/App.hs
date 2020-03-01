@@ -1,7 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+-- | This module implements a brick application for browsing a 'LineNode' tree.
+
 module Profold.App
   ( UiState
+  , UiName
   , newUiState
   , myApp
   ) where
@@ -14,16 +17,24 @@ import qualified Graphics.Vty       as Vty
 
 import           Profold.LineNode
 
+-- | Unique names for UI elements used in this application.
 data UiName = UiList
   deriving (Show, Eq, Ord)
 
+-- | The state for the brick application.
 data UiState = UiState
   { uiInfo :: [T.Text]
   , uiTree :: LineNode
   , uiList :: List UiName (Path, LineNode)
   } deriving (Show)
 
-newUiState :: [T.Text] -> LineNode -> UiState
+-- | Create an initial ui state.
+newUiState
+  :: [T.Text]
+  -- ^ A list of lines which should contain the column labels. These lines will always be displayed at the top of the screen.
+  -> LineNode
+  -- ^ The tree to display.
+  -> UiState
 newUiState info ln = toggleFold $ UiState info ln $ list UiList (flatten ln) 1
 
 toggleFold :: UiState -> UiState
@@ -74,6 +85,7 @@ myAttrMap = attrMap Vty.defAttr
   , ("info", Vty.defAttr `Vty.withStyle` Vty.reverseVideo)
   ]
 
+-- | The brick application.
 myApp :: App UiState () UiName
 myApp = App
   { appDraw         = myAppDraw

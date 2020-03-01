@@ -1,5 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+-- | This module contains a parser for parsing @.prof@ files.
+
 module Profold.ParseProfFile
   ( ProfFile(..)
   , parseProfFile
@@ -13,6 +15,8 @@ import           Text.Megaparsec.Char
 
 import           Profold.LineNode
 
+-- | A @.prof@ file includes a few lines at the beginning that contain the
+-- column names.
 data ProfFile = ProfFile
   { profInfoLines :: [T.Text]
   , profNode      :: LineNode
@@ -48,6 +52,8 @@ profFile = do
   node <- lineNode ""
   pure $ ProfFile info node
 
+-- | A parser for @.prof@ files. If the file could not be parsed, returns a
+-- @Left errorMessage@.
 parseProfFile :: String -> T.Text -> Either String ProfFile
 parseProfFile filename text = case parse profFile filename text of
   Left e   -> Left $ errorBundlePretty e

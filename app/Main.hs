@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main where
 
 import           Brick
@@ -10,9 +8,6 @@ import           Options.Applicative
 import           Profold.App
 import           Profold.Options
 import           Profold.ParseProfFile
-
-data UiName = UiViewport
-  deriving (Show, Eq, Ord)
 
 main :: IO ()
 main = do
