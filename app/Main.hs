@@ -15,5 +15,5 @@ main = do
   let filename = optFileName opts
   text <- T.readFile filename
   case parseProfFile filename text of
-    Left e     -> putStrLn e
+    Left e  -> putStrLn e
     Right f -> void $ defaultMain myApp $ newUiState (profInfoLines f) (profNode f)
